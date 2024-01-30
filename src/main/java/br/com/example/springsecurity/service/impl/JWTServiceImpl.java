@@ -1,5 +1,6 @@
 package br.com.example.springsecurity.service.impl;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -9,10 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.function.Function;
 
 @Service
 public class JWTServiceImpl {
-    private String generateToken(UserDetails userDetails){
+    private String generateToken(UserDetails userDetails) {
         return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 40))
@@ -20,9 +22,20 @@ public class JWTServiceImpl {
                 .compact();
     }
 
-    private Key getSignKey(){
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolvers.apply(claims);
+
+    }
+
+    private Key getSignKey() {
         byte[] key = Decoders.BASE64.decode("413F4428472B4B625065536856605970337336763979244226452948404D6351");
         return Keys.hmacShaKeyFor(key);
     }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+    }
+
 
 }
