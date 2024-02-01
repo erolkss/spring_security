@@ -1,5 +1,7 @@
 package br.com.example.springsecurity.controller;
 
+import br.com.example.springsecurity.dto.JwtAuthenticationResponse;
+import br.com.example.springsecurity.dto.SignInRequest;
 import br.com.example.springsecurity.dto.SignUpRequest;
 import br.com.example.springsecurity.entity.User;
 import br.com.example.springsecurity.service.AuthenticationService;
@@ -18,8 +20,13 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signUp(@RequestBody SignUpRequest signUpRequest){
+    public ResponseEntity<User> signUp(@RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(authenticationService.signUp(signUpRequest));
-
     }
+
+    @PostMapping("/signin")
+    public ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody SignInRequest signInRequest) {
+        return ResponseEntity.ok(authenticationService.signIn(signInRequest));
+    }
+
 }
